@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:5.0.6-focal
+    restart: always
+    ports:
+      - 27017:27017
+
+  rabbitmq:
+    image: rabbitmq:3.9.14-management
+    restart: always
+    ports:
+      - 15672:15672
+      - 5672:5672
+    volumes:
+      - .data/broker/data:/var/lib/rabbitmq
+      - ./broker/init:/etc/rabbitmq    
+  
+  eventstore:
+    image: eventstore/eventstore:5.0.11-bionic
+    restart: always
+    ports:
+      - "2113:2113"
+      - "1113:1113"
+
+  healthcheck-ui:
+    image: xabarilcoding/healthchecksui:5.0.0
+    restart: always
+    ports:
+      - "4000:80"
+    environment:
+      - "HEALTHCHECKSUI__HEALTHCHECKS__0__NAME=Mercury"
+      - "HEALTHCHECKSUI__HEALTHCHECKS__0__URI=http://mercury/health"
+      - "HEALTHCHECKSUI__HEALTHCHECKS__1__NAME=Venus"
+      - "HEALTHCHECKSUI__HEALTHCHECKS__1__URI=http://venus/health"
+      - "HEALTHCHECKSUI__HEALTHCHECKS__2__NAME=Mars"
+      - "HEALTHCHECKSUI__HEALTHCHECKS__2__URI=http://mars/health"
+  
+  mercury:
+    build: ..
+    ports:
+      - "4001:80"
+    environment:
+      - "Range=200"
+      - "UnhealthyThreshold=100"
+      - "DegradedThreshold=25"
+    
+  venus:
+    build: ..
+    ports:
+      - "4002:80"
+    environment:
+      - "Range=100"
+      - "UnhealthyThreshold=90"
+      - "DegradedThreshold=40"
+    
+  mars:
+    build: ..
+    ports:
+      - "4003:80"
+    
