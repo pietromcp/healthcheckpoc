@@ -30,6 +30,7 @@ services:
     ports:
       - "4000:80"
     environment:
+      - "UI_PATH=/"
       - "HEALTHCHECKSUI__HEALTHCHECKS__0__NAME=Mercury"
       - "HEALTHCHECKSUI__HEALTHCHECKS__0__URI=http://mercury/health"
       - "HEALTHCHECKSUI__HEALTHCHECKS__1__NAME=Venus"
